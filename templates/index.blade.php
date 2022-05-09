@@ -158,7 +158,11 @@ class {{ $data['pascal_plural'] }} extends Component {
         const columns = [
 @foreach($data['fields'] as $field)
 @if($field['name'] !== 'created_at' && $field['name'] !== 'updated_at' && $field['name'] !== 'deleted_at')
+@if($field['foreign_key'] == TRUE)
+          { field: '{{$field['name']}}', headerName: '{{Str::studly(Str::singular($field['foreign_table']))}}', flex: 1, minWidth: 150 },
+@else
           { field: '{{$field['name']}}', headerName: '{{$field['pascal']}}', flex: 1, minWidth: 150 },
+@endif
 @endif
 @endforeach
           { field: 'actions', headerName: 'Ações', flex: 1, minWidth: 150, renderCell: this.ActionsButtons },
@@ -170,6 +174,8 @@ class {{ $data['pascal_plural'] }} extends Component {
 @foreach($data['fields'] as $field)
 @if($field['name'] == 'active' || $field['name'] == 'status' || $field['type'] == 'date')
               {{$field['name']}}: k.{{$field['name']}}_str,
+@elseif($field['foreign_key'] == TRUE)
+              {{$field['name']}}: k.{{strtolower(Str::singular($field['foreign_table']))}}.name,
 @elseif($field['name'] !== 'created_at' && $field['name'] !== 'updated_at' && $field['name'] !== 'deleted_at')
               {{$field['name']}}: k.{{$field['name']}},
 @endif

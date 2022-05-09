@@ -35,9 +35,7 @@ class Crud extends Model
                 // Observo se o nome do campo está no padrão "nome_tabela_id"
                 // Se não estiver, o nome da relação será o nome do campo sem o "_id"
                 $field_name = $foreign_key->getLocalColumns()[0];
-                $expected_name = Str::singular($foreign_key->getForeignTableName()) . '_id';
-                $name_is_expected = $field_name === $expected_name;
-                $relationship_name = $name_is_expected ? $field_name : str_replace('_id', '', $field_name);
+                $relationship_name = str_replace('_id', '', $field_name);
 
                 $related_tables[$foreign_key->getLocalColumns()[0]] = [
                     'table' => $foreign_key->getForeignTableName(),
@@ -52,54 +50,26 @@ class Crud extends Model
         $db_tables = DB::select('SHOW TABLES');
         $db_tables_names = [];
         $db_name = 'Tables_in_' . env('DB_DATABASE');
+        $child_tables = [];
         foreach ($db_tables as $db_table) {
             $db_tables_names[] = $db_table->$db_name;
+            $foreign_keys = Schema::getConnection()->getDoctrineSchemaManager()->listTableForeignKeys($db_table->$db_name);
+            foreach ($foreign_keys as $foreign_key) {
+                if ($foreign_key->getForeignTableName() == $plural) {
+                    $model = Str::studly(Str::singular($db_table->$db_name));
+                    $child_tables[] = [
+                        'table' => $db_table->$db_name,
+                        'key' => $foreign_key->getLocalColumns()[0],
+                        'model' => $model,
+                    ];
+                }
+            }
         }
 
         if (in_array(strtolower($plural), $db_tables_names)) {
             $data = DB::select('DESCRIBE '.strtolower($plural));
         } else {
             return FALSE;
-        }
-
-        $child_name = strtolower($singular) . '_';
-        $str_db_tables_names = implode(',', $db_tables_names);
-        $child_count = substr_count($str_db_tables_names, $child_name);
-        $child_tables = [];
-        $y = 1;
-        if ($child_count > 0) {
-            $key = $child_name . 'id';
-            $child_initial_pos = strpos($str_db_tables_names, $child_name);
-            $child_last_pos = strpos($str_db_tables_names, ',', $child_initial_pos);
-            $child_length = $child_last_pos - $child_initial_pos;
-            $child_table = substr($str_db_tables_names, $child_initial_pos, $child_length);
-            if (in_array($child_table, $db_tables_names)) {
-                $child_model = Str::studly(Str::singular($child_table));
-                $child_tables[] = [
-                    'table' => $child_table,
-                    'key' => $key,
-                    'model' => $child_model,
-                ];
-            }
-            while ($child_count >= $y) {
-                $child_initial_pos = strpos($str_db_tables_names, $child_name, ($child_initial_pos + $y));
-                if ($child_initial_pos === FALSE) {
-                    $y++;
-                    continue;
-                }
-                $child_last_pos = strpos($str_db_tables_names, ',', $child_initial_pos);
-                $child_length = $child_last_pos - $child_initial_pos;
-                $child_table = substr($str_db_tables_names, $child_initial_pos, $child_length);
-                if (in_array($child_table, $db_tables_names)) {
-                    $child_model = Str::studly(Str::singular($child_table));
-                    $child_tables[] = [
-                        'table' => $child_table,
-                        'key' => $key,
-                        'model' => $child_model,
-                    ];
-                }
-                $y++;
-            }
         }
         
         $fieldsArray = [];
