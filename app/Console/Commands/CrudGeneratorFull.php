@@ -59,7 +59,8 @@ class CrudGeneratorFull extends Command
         $bar = new ProgressBar($this->output, count($tables));
 
         foreach ($tables as $table) {
-            $table_name = $table->Tables_in_forexpool;
+            //Rename "database" to your database name
+            $table_name = $table->Tables_in_database;
 
             if (in_array($table_name, $ignore_tables)) {
                 continue;
