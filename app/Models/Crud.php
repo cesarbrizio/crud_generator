@@ -361,26 +361,58 @@ class Crud extends Model
         $client = Storage::createLocalDriver(['root' => config('crudApi.components_file_dir')]);
 
         //Header
-        $headers_text = "\n\t\t\t\t<NavDropdown title='".$data['pascal_plural']."' id='".$data['plural']."'>\n";
-        $headers_text .= "\t\t\t\t\t<NavDropdown.Header>".$data['pascal_plural']."</NavDropdown.Header>\n";
-        $headers_text .= "\t\t\t\t\t<NavDropdown.Item href={'/".$data['plural']."/list'}>".$data['pascal_plural']." List</NavDropdown.Item>\n";
-        $headers_text .= "\t\t\t\t\t<NavDropdown.Item href={'/".$data['plural']."/add'}>Add ".$data['pascal_singular']."</NavDropdown.Item>\n";
-        $headers_text .= "\t\t\t\t</NavDropdown>\n";
+        $headers_text = "\n\t\t<ExpandableItem\n";
+        $headers_text .= "\t\t\trender={xprops => (\n";
+        $headers_text .= "\t\t\t<>\n";
+        $headers_text .= "\t\t<ListItemButton onClick={() => xprops.setOpenCollapse(!xprops.openCollapse)}>\n";
+        $headers_text .= "\t\t\t<ListItemIcon>\n";
+        $headers_text .= "\t\t\t\t<AssignmentIcon />\n";
+        $headers_text .= "\t\t\t</ListItemIcon>\n";
+        $headers_text .= "\t\t\t<ListItemText primary='".$data['pascal_singular']."' />\n";
+        $headers_text .= "\t\t\t{xprops.openCollapse ? <ExpandLess /> : <ExpandMore />}\n";
+        $headers_text .= "\t\t</ListItemButton>\n";
+        $headers_text .= "\t\t<Collapse in={xprops.openCollapse} timeout='auto' unmountOnExit>\n";
+        $headers_text .= "\t\t\t<List component='div' disablePadding>\n";
+        $headers_text .= "\t\t\t\t<Link to='/".$data['plural_lower']."/list' style={{ textDecoration: 'none', color: theme.palette.text.primary }}>\n";
+        $headers_text .= "\t\t\t\t\t<ListItemButton sx={{ pl: 4 }}>\n";
+        $headers_text .= "\t\t\t\t\t\t<ListItemIcon>\n";
+        $headers_text .= "\t\t\t\t\t\t\t<ListIcon />\n";
+        $headers_text .= "\t\t\t\t\t\t</ListItemIcon>\n";
+        $headers_text .= "\t\t\t\t\t\t<ListItemText primary='List' />\n";
+        $headers_text .= "\t\t\t\t\t</ListItemButton>\n";
+        $headers_text .= "\t\t\t\t</Link>\n";
+        $headers_text .= "\t\t\t\t<Link to='/".$data['plural_lower']."/add' style={{ textDecoration: 'none', color: theme.palette.text.primary }}>\n";
+        $headers_text .= "\t\t\t\t\t<ListItemButton sx={{ pl: 4 }}>\n";
+        $headers_text .= "\t\t\t\t\t\t<ListItemIcon>\n";
+        $headers_text .= "\t\t\t\t\t\t\t<AddCircleIcon />\n";
+        $headers_text .= "\t\t\t\t\t\t</ListItemIcon>\n";
+        $headers_text .= "\t\t\t\t\t\t<ListItemText primary='Add' />\n";
+        $headers_text .= "\t\t\t\t\t</ListItemButton>\n";
+        $headers_text .= "\t\t\t\t</Link>\n";
+        $headers_text .= "\t\t\t</List>\n";
+        $headers_text .= "\t\t</Collapse>\n";
+        $headers_text .= "\t\t\t</>\n";
+        $headers_text .= "\t\t\t)}\n";
+        $headers_text .= "\t\t/>\n";
 
         //Agrupo todas as importações em um arquivo
-        if ($client->exists('/Layout/Headers_NavDropdown.js')) {
-            $headersFile = $client->get('/Layout/Headers_NavDropdown.js');
+        if ($client->exists('/Layout/Item.js')) {
+            $headersFile = $client->get('/Layout/Item.js');
             $appendedHeaders = $headersFile.$headers_text;
-            $client->put('/Layout/Headers_NavDropdown.js', $appendedHeaders);
+            $client->put('/Layout/Item.js', $appendedHeaders);
         } else {
-            $client->put('/Layout/Headers_NavDropdown.js', $headers_text);
+            $client->put('/Layout/Item.js', $headers_text);
         }
-        $headers = $client->get('/Layout/Headers_NavDropdown.js');
+        $headers = $client->get('/Layout/Item.js');
         
         // Create the file
         $data = htmlspecialchars($headers);
         $crudTemplate = view::make('crudApi::header',['data' =>$data])->render();
         $client->put('Layout/Header.js', $crudTemplate );
+
+        // Create the additional file
+        $crudTemplate = view::make('crudApi::header_additional',['data' =>$data])->render();
+        $client->put('Layout/ExpandableItem.js', $crudTemplate );
         
         return;
     

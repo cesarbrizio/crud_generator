@@ -220,10 +220,10 @@ class {{$data['pascal_singular']}}Add extends Component {
           {this.state.redirect_url ? <Navigate to={{"{{"}}pathname: this.state.redirect_url}}/> : ""}
           <Container>
             <div className="conteudo">
-              <h3>Cadastrar</h3>
+              <h3>Add {{$data['pascal_singular']}}</h3>
               <Stack direction="row" justifyContent="flex-end" spacing={2}>
                 <Fab variant="extended" size="medium" color="primary" href="/{{$data['plural']}}/list">
-                  <ArrowBackIcon sx={{"{{"}} mr: 1 }} /> Voltar
+                  <ArrowBackIcon sx={{"{{"}} mr: 1 }} /> Back
                 </Fab>
               </Stack>
               <div className="clearfix"></div>
@@ -315,7 +315,7 @@ class {{$data['pascal_singular']}}Add extends Component {
 @endforeach
                   <Grid item xl={2} md={2} sm={2} xs={2}>
                     <Fab variant="extended" type="submit" color="primary">
-                        <SaveIcon sx={{"{{"}} mr: 1 }} /> Adicionar
+                        <SaveIcon sx={{"{{"}} mr: 1 }} /> Add
                     </Fab>
                   </Grid>
                 </Grid>

@@ -204,17 +204,17 @@ class {{ $data['pascal_plural'] }} extends Component {
             <Overlay overlay={this.state.overlay} handleAlert={this.handleAlert} />
             <Container>
                 <div className="conteudo">
-                    <h3>Listagem</h3>
+                    <h3>List of {{$data['pascal_plural']}}</h3>
                     <Stack direction="row" justifyContent="flex-end" spacing={2}>
                       <Fab variant="extended" size="medium" color="primary" href="/{{$data['plural']}}/add">
-                        <AddCircleIcon sx={{"{{"}} mr: 1 }} /> Cadastrar
+                        <AddCircleIcon sx={{"{{"}} mr: 1 }} /> Add
                       </Fab>
                     </Stack>
                     <div className="clearfix"></div>
                     <hr/>
                     <div style={{"{{"}} height: 500, width: '100%' }}>
                       <DataGrid
-                        localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+                        // localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
                         rows={self.state.rows}
                         columns={self.state.columns}
                         pageSize={10}
