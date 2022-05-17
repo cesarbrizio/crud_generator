@@ -61,7 +61,8 @@ class CrudGeneratorFull extends Command
         $ignore = false;
         
         foreach ($tables as $table) {
-            $table_name = $table->Tables_in_qms;
+            $db_name = 'Tables_in_' . env('DB_DATABASE');
+            $table_name = $table->$db_name;
 
             if (in_array($table_name, $ignore_tables)) {
                 continue;
