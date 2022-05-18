@@ -264,7 +264,7 @@ class {{$data['pascal_singular']}}Add extends Component {
                   </Grid>
 @elseif($field['type'] == 'enum')
                   <Grid item xl={6} md={6} sm={12} xs={12}>
-                    <FormControl error={this.state.error_{{$field['name']}}}>
+                    <FormControl fullWidth error={this.state.error_{{$field['name']}}}>
                       <InputLabel id="{{$field['name']}}">{{$field['name']}}</InputLabel>
                       <Select
                         labelId="{{$field['name']}}"
@@ -288,7 +288,7 @@ class {{$data['pascal_singular']}}Add extends Component {
                   </Grid>
 @elseif($field['foreign_key'] == TRUE)
                   <Grid item xl={6} md={6} sm={12} xs={12}>
-                    <FormControl error={this.state.error_{{$field['name']}}}>
+                    <FormControl fullWidth error={this.state.error_{{$field['name']}}}>
                       <InputLabel id="{{$field['name']}}">{{$field['name']}}</InputLabel>
                       <Select
                         labelId="{{$field['name']}}"

@@ -205,13 +205,6 @@ class Crud extends Model
     public static function createModel($data) {
       
         $client = Storage::createLocalDriver(['root' => config('crudApi.model_dir')]);
-        
-        // Check if file already exists. If it does ask if we want to overwrite
-        if ($client->exists($data['pascal_singular'])) {
-            if (!self::confirm($data['pascal_singular'].' model already exists. Would you like to overwrite this model?')){
-                return false;
-            }
-        }
             
         // Create the file
         $modelTemplate = view::make('crudApi::model',['data' => $data])->render();
@@ -225,13 +218,6 @@ class Crud extends Model
     public static function createRepository($data) {
       
         $client = Storage::createLocalDriver(['root' => config('crudApi.repository_dir')]);
-        
-        // Check if file already exists. If it does ask if we want to overwrite
-        if ($client->exists($data['pascal_singular'])) {
-            if (!self::confirm($data['pascal_singular'].' repository already exists. Would you like to overwrite this repository?')){
-                return false;
-            }
-        }
             
         // Create the file
         $repositoryTemplate = view::make('crudApi::repository',['data' => $data])->render();
