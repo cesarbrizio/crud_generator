@@ -124,7 +124,7 @@ class Crud extends Model
             if ($fieldsArray[$i]['required'] && $fieldsArray[$i]['name'] !== 'id') $validations[] = 'required';
             if ($fieldsArray[$i]['max'] && $fieldsArray[$i]['name'] !== 'id') $validations[] = 'max:'.$fieldsArray[$i]['max'];
             if ($fieldsArray[$i]['type'] == 'date') {$validations[] = 'date'; $appends[] = $fieldsArray[$i]['name'] . '_str';}
-            if ($fieldsArray[$i]['type'] == 'datetime') {$validations[] = 'datetime'; $appends[] = $fieldsArray[$i]['name'] . '_str';}
+            if ($fieldsArray[$i]['type'] == 'datetime') {$validations[] = 'dateformat:Y-m-d H:i'; $appends[] = $fieldsArray[$i]['name'] . '_str';}
             if (strpos($fieldsArray[$i]['name'], 'value') !== false || $fieldsArray[$i]['type'] == 'integer') $validations[] = 'integer';
             if (strpos($fieldsArray[$i]['name'], 'email') !== false) $validations[] = 'email';
             if ($fieldsArray[$i]['name'] == 'active') $appends[] = 'active_str';
