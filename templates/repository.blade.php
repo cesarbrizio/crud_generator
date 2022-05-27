@@ -24,27 +24,6 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
     ];
 
     /*
-    * Relationships
-    */
-@if(!empty($data['related_tables']))
-@foreach($data['related_tables'] as $related_table)
-    public function {{$related_table['relationship_name']}} ()
-    {
-      return $this->belongsTo('App\Models\{{$related_table['model']}}', '{{$related_table['foreign_id']}}', 'id');
-    }
-@endforeach
-@endif
-
-@if(!empty($data['child_tables']))
-@foreach($data['child_tables'] as $child_table)
-    public function {{$child_table['table']}} ()
-    {
-      return $this->hasMany('App\Models\{{$child_table['model']}}');
-    }
-@endforeach
-@endif
-
-    /*
     * Callbacks, Mutatos e Accessors
     */
 @foreach($data['fields'] as $field)
