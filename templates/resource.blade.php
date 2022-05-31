@@ -21,7 +21,13 @@ class {{ $data['pascal_singular'] }}Resource extends JsonResource
     {
         return [
 @foreach($data['fields'] as $field)
+@if($field['type'] == 'date')
+            '{{$field['name']}}' => \App\Models\AppModel::parseDate($this->{{$field['name']}}, 'd/m/Y'),
+@elseif($field['type'] == 'datetime')
+            '{{$field['name']}}' => \App\Models\AppModel::parseDate($this->{{$field['name']}}, 'd/m/Y H:i:s'),
+@else
             '{{$field['name']}}' => $this->{{$field['name']}},
+@endif
 @endforeach
 @if(!empty($data['child_tables']))
 @foreach($data['child_tables'] as $childTable)

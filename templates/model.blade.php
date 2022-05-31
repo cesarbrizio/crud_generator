@@ -7,30 +7,6 @@ use App\Repositories\{{ $data['pascal_singular'] }}Repository;
 class {{ $data['pascal_singular'] }} extends {{ $data['pascal_singular'] }}Repository
 {
     /*
-    * Relationships
-    */
-@if(!empty($data['related_tables']))
-@foreach($data['related_tables'] as $related_table)
-@if($related_table['model_count'] == 1)
-    public function {{$related_table['relationship_name']}} ()
-    {
-      return $this->belongsTo({{$related_table['model']}}::class);
-    }
-@endif
-@endforeach
-@endif
-@if(!empty($data['child_tables']))
-@foreach($data['child_tables'] as $child_table)
-@if($child_table['model_count'] == 1)
-    public function {{$child_table['table']}} ()
-    {
-      return $this->hasMany({{$child_table['model']}}::class);
-    }
-@endif
-@endforeach
-@endif
-
-    /*
     * Functions
     */
 @if(!empty($data['related_tables']))

@@ -157,14 +157,25 @@ class Crud extends Model
 
         $other_tables = [];
         if (!empty($related_tables)) {
-            $other_tables[] = implode("', '", array_column($related_tables, 'relationship_name'));
+            $unique_related_tables = [];
+            foreach($related_tables as $related_table){
+                if($related_table['model_count'] == 1){
+                    $unique_related_tables[] = $related_table;
+                }
+            }
+            $other_tables[] = implode("', '", array_column($unique_related_tables, 'relationship_name'));
         }
         if (!empty($child_tables)) {
-            $other_tables[] = implode("', '", array_column($child_tables, 'table'));
+            $unique_child_tables = [];
+            foreach($child_tables as $child_table){
+                if($child_table['model_count'] == 1){
+                    $unique_child_tables[] = $child_table;
+                }
+            }
+            $other_tables[] = implode("', '", array_column($unique_child_tables, 'table'));
         }
         $other_tables_str = "'".implode("', '", $other_tables)."'";
         $other_tables_str = htmlspecialchars($other_tables_str);
-        
         $pascal_singular = Str::studly($singular);
         $pascal_plural = Str::studly($plural);
         return array(
