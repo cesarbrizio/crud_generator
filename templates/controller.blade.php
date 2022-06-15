@@ -1,6 +1,7 @@
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\{{ $data['pascal_singular'] }}Request;
+use App\Http\Resources\{{ $data['pascal_singular'] }}Resource;
 use App\Models\{{ $data['pascal_singular'] }};
 
 class {{ $data['pascal_plural'] }}Controller extends Controller
@@ -8,82 +9,41 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
     
     public function index() {
 
-@if(!empty($data['other_tables']))
-      ${{ strtolower($data['singular']) }} = {{ $data['pascal_singular'] }}::with({!! htmlspecialchars_decode($data['other_tables_str']) !!})->get();
-@else
-      ${{ strtolower($data['singular']) }} = {{ $data['pascal_singular'] }}::get();
-@endif
-      if(empty(${{ strtolower($data['singular']) }})) {
+      ${{ lcfirst($data['pascal_singular']) }} = {{ $data['pascal_singular'] }}::all();
+
+      if(empty(${{ lcfirst($data['pascal_singular']) }})) {
         return response()->json(['data' => null, 'status' => 'error', 'message' => 'Não há nenhum registro para ser exibido.']); 
       }
-      return response()->json(['data' => ${{ strtolower($data['singular']) }}, 'status' => 'success', 'message' => '']);
-
+      return {{ $data['pascal_singular'] }}Resource::collection(${{ lcfirst($data['pascal_singular']) }}->loadMissing([{!! htmlspecialchars_decode($data['other_tables_str']) !!}]));
     }
 
-    public function show($id) {
+    public function show({{ $data['pascal_singular'] }} ${{ lcfirst($data['pascal_singular']) }}) {
 
-@if(!empty($data['other_tables']))
-      ${{ strtolower($data['singular']) }} = {{ $data['pascal_singular'] }}::with({!! htmlspecialchars_decode($data['other_tables_str']) !!})->findOrFail($id);
-@else
-      ${{ strtolower($data['singular']) }} = {{ $data['pascal_singular'] }}::findOrFail($id);
-@endif
-
-      if(!isset(${{ strtolower($data['singular']) }})) {
-        return response()->json(['data' => null, 'status' => 'error', 'message' => 'Registro não localizado.']); 
-      }
-      return response()->json(['data' => ${{ strtolower($data['singular']) }}, 'status' => 'success', 'message' => '']);
-
+      return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }}->loadMissing([{!! htmlspecialchars_decode($data['other_tables_str']) !!}]));
     }
     
-    public function create(Request $request) {
+    public function store({{ $data['pascal_singular'] }}Request $request) {
 
-      $validation = {{ $data['pascal_singular'] }}::{{ strtolower($data['singular']) }}_validation($request);
-
-      $data = $request->all();
-
-      ${{ strtolower($data['singular']) }} = new {{ $data['pascal_singular'] }};
-@foreach($data['fields'] as $field)
-@if($field['name'] == 'active')
-      ${{ strtolower($data['singular']) }}->active = 1;
-@elseif($field['name'] == 'status')
-      ${{ strtolower($data['singular']) }}->status = 1;
-@elseif($field['name'] !== 'created_at' && $field['name'] !== 'updated_at' && $field['name'] !== 'deleted_at')
-      ${{ strtolower($data['singular']) }}->{{$field['name']}} = @$data['{{$field['name']}}'];
-@endif
-@endforeach
-
-      if (${{ strtolower($data['singular']) }}->save()) {
-        ${{ strtolower($data['singular']) }}->get();
-        return response()->json(['data' => ${{ strtolower($data['singular']) }}, 'status' => 'success', 'message' => 'Registro adicionado com sucesso.']);
+      if (${{ lcfirst($data['pascal_singular']) }} = {{ $data['pascal_singular'] }}::create($request->validated()))
+        {
+        return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }});
       }
-      return response()->json(['data' => '', 'status' => 'error', 'message' => 'Não foi possível adicionar o registro, verifique os dados preenchidos.']);
-
     }
-    
-    public function update(Request $request) {
 
-      $validation = {{ $data['pascal_singular'] }}::{{ strtolower($data['singular']) }}_validation($request);
+    public function update({{ $data['pascal_singular'] }}Request $request, {{ $data['pascal_singular'] }} ${{ lcfirst($data['pascal_singular']) }}) {
 
-      $data = $request->all();
-
-      ${{ strtolower($data['singular']) }} = {{ $data['pascal_singular'] }}::findOrFail($data['id']);
-      if(${{ strtolower($data['singular']) }}->fill($data)->save()) {
-        return response()->json(['data' => ${{ strtolower($data['singular']) }}, 'status' => 'success', 'message' => 'Registro atualizado com sucesso.']);
+      if(${{ lcfirst($data['pascal_singular']) }}->update($request->validated())) {
+        return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }});
       } else {
         return response()->json(['data' => null, 'status' => 'error', 'message' => 'Não foi possível atualizar o registro.']);
       }
-
     }
     
-    public function destroy($id) {
+    public function destroy({{ $data['pascal_singular'] }} ${{ lcfirst($data['pascal_singular']) }}) {
 
-        ${{ strtolower($data['singular']) }} = {{ $data['pascal_singular'] }}::findOrFail($id);
-
-        if(${{ strtolower($data['singular']) }}->delete()) {
-          return response()->json(['data' => ${{ strtolower($data['singular']) }}, 'status' => 'success', 'message' => 'Registro deletado com sucesso.']);
+        if(${{ lcfirst($data['pascal_singular']) }}->delete()) {
+          return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }});
         }
-        return response()->json(['data' => null, 'status' => 'error', 'message' => 'Não foi possível deletar o registro.']);
-
     }
 
 @if(!empty($data['related_tables']))

@@ -6,20 +6,9 @@ use App\Repositories\{{ $data['pascal_singular'] }}Repository;
 
 class {{ $data['pascal_singular'] }} extends {{ $data['pascal_singular'] }}Repository
 {
-
     /*
     * Functions
     */
-    public static function {{ strtolower($data['singular']) }}_validation ($request) {
-      $validatedData = $request->validate([
-@foreach($data['fields'] as $field)
-@if(!empty($field['validations']))
-        '{{$field['name']}}' => '{{$field['validations']}}',
-@endif
-@endforeach
-      ]);
-    }
-
 @if(!empty($data['related_tables']))
 @foreach($data['related_tables'] as $related_table)
 @if($related_table['model_count'] == 1)

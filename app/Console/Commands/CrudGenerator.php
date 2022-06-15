@@ -63,6 +63,12 @@ class CrudGenerator extends Command
         Crud::createController($data);
         $this->info('Controller criado');
 
+        Crud::createResource($data);
+        $this->info('Resource criado');
+
+        Crud::createRequest($data);
+        $this->info('Request criado');
+
         Crud::createIndexComponentTemplate($data);
         $this->info('Component Index criado');
 

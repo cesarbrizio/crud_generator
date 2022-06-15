@@ -52,15 +52,27 @@ class Crud extends Model
         $db_name = 'Tables_in_' . env('DB_DATABASE');
         $child_tables = [];
         foreach ($db_tables as $db_table) {
+
             $db_tables_names[] = $db_table->$db_name;
             $foreign_keys = Schema::getConnection()->getDoctrineSchemaManager()->listTableForeignKeys($db_table->$db_name);
             foreach ($foreign_keys as $foreign_key) {
                 if ($foreign_key->getForeignTableName() == $plural) {
                     $model = Str::studly(Str::singular($db_table->$db_name));
+                    
+                // Observo se existe mais de uma relação para a mesma tabela
+                // Se houver, marco que não é a primeira vez que esta tabela aparece
+                // Assim, posteriormente eu posso ignorar quando não for a primeira vez
+                $count = 1;
+                if (in_array($model, $same_table)) {
+                    $count++;
+                }
+                $same_table[] = $model;
+
                     $child_tables[] = [
                         'table' => $db_table->$db_name,
                         'key' => $foreign_key->getLocalColumns()[0],
                         'model' => $model,
+                        'model_count' => $count,
                     ];
                 }
             }
@@ -145,14 +157,25 @@ class Crud extends Model
 
         $other_tables = [];
         if (!empty($related_tables)) {
-            $other_tables[] = implode("', '", array_column($related_tables, 'relationship_name'));
+            $unique_related_tables = [];
+            foreach($related_tables as $related_table){
+                if($related_table['model_count'] == 1){
+                    $unique_related_tables[] = $related_table;
+                }
+            }
+            $other_tables[] = implode("', '", array_column($unique_related_tables, 'relationship_name'));
         }
         if (!empty($child_tables)) {
-            $other_tables[] = implode("', '", array_column($child_tables, 'table'));
+            $unique_child_tables = [];
+            foreach($child_tables as $child_table){
+                if($child_table['model_count'] == 1){
+                    $unique_child_tables[] = $child_table;
+                }
+            }
+            $other_tables[] = implode("', '", array_column($unique_child_tables, 'table'));
         }
         $other_tables_str = "'".implode("', '", $other_tables)."'";
         $other_tables_str = htmlspecialchars($other_tables_str);
-        
         $pascal_singular = Str::studly($singular);
         $pascal_plural = Str::studly($plural);
         return array(
@@ -175,19 +198,19 @@ class Crud extends Model
     public static function createRoutes($data) {
     
         $client = Storage::createLocalDriver(['root' => config('crudApi.routes_dir')]);
-        
         $routes = "\n// ".$data['pascal_plural']."\n";
-        $routes .= "Route::get('/".$data['plural_lower']."', 'App\Http\Controllers\\".$data['pascal_plural']."Controller@index');\n";
-        $routes .= "Route::get('/".$data['plural_lower']."/{id}', 'App\Http\Controllers\\".$data['pascal_plural']."Controller@show');\n";
-        $routes .= "Route::post('/".$data['plural_lower']."', 'App\Http\Controllers\\".$data['pascal_plural']."Controller@create');\n";
-        $routes .= "Route::put('/".$data['plural_lower']."', 'App\Http\Controllers\\".$data['pascal_plural']."Controller@update');\n";
-        $routes .= "Route::delete('/".$data['plural_lower']."/{id}', 'App\Http\Controllers\\".$data['pascal_plural']."Controller@destroy');\n";
+        $routes .= "Route::get('/".$data['plural_lower']."', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'index']);\n";
+        $routes .= "Route::get('/".$data['plural_lower']."/{".lcfirst($data['pascal_singular']) ."}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'show']);\n";
+        $routes .= "Route::post('/".$data['plural_lower']."', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'store']);\n";
+        $routes .= "Route::put('/".$data['plural_lower']."/{".lcfirst($data['pascal_singular']) ."}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'update']);\n";
+        $routes .= "Route::delete('/".$data['plural_lower']."/{".lcfirst($data['pascal_singular']) ."}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'destroy']);\n";
+
         if(!empty($data['related_tables'])) {
-            $routes .= "Route::get('/".$data['plural_lower']."/related/options', 'App\Http\Controllers\\".$data['pascal_plural']."Controller@options');\n";
+            $routes .= "Route::get('/".$data['plural_lower']."/related/options', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'options']);\n";
         }
         foreach ($data['fields'] as $field) {
             if (!empty($field['options'])) {
-                $routes .= "Route::get('/".$data['plural_lower']."/".$field['name']."/options/"."', 'App\Http\Controllers\\".$data['pascal_plural']."Controller@".$field['name']."_options');\n";
+                $routes .= "Route::get('/".$data['plural_lower']."/".$field['name']."/options/'".", [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, '".$field['name']."_options']);\n";
             }
         }
         
@@ -199,7 +222,6 @@ class Crud extends Model
             $routeFile = $client->get('/'.config('crudApi.routes_file'));
             $client->put(config('crudApi.routes_file'), $routes);
         }
-
     }
 
     public static function createModel($data) {
@@ -210,6 +232,31 @@ class Crud extends Model
         $modelTemplate = view::make('crudApi::model',['data' => $data])->render();
         $modelTemplate = "<?php \n".$modelTemplate." ?>";
         $client->put($data['pascal_singular'].'.php', $modelTemplate );
+
+        return;
+    
+    }
+
+    public static function createResource($data) {
+      
+        $client = Storage::createLocalDriver(['root' => config('crudApi.resource_dir')]);
+        
+        // Create the file
+        $resourceTemplate = view::make('crudApi::resource',['data' => $data])->render();
+        $resourceTemplate = "<?php \n".$resourceTemplate." ?>";
+        $client->put($data['pascal_singular'].'Resource.php', $resourceTemplate );
+
+        return;
+    }
+
+    public static function createRequest($data) {
+      
+        $client = Storage::createLocalDriver(['root' => config('crudApi.request_dir')]);
+            
+        // Create the file
+        $requestTemplate = view::make('crudApi::request',['data' => $data])->render();
+        $requestTemplate = "<?php \n".$requestTemplate." ?>";
+        $client->put($data['pascal_singular'].'Request.php', $requestTemplate );
 
         return;
     
