@@ -58,12 +58,34 @@ class CrudGeneratorFull extends Command
 
         $bar = new ProgressBar($this->output, count($tables));
 
+        $ignore = false;
+        
         foreach ($tables as $table) {
             $db_name = 'Tables_in_' . env('DB_DATABASE');
             $table_name = $table->$db_name;
 
             if (in_array($table_name, $ignore_tables)) {
                 continue;
+            }
+
+            $dir = scandir(config('crudApi.model_dir'));
+            $model_name = Str::studly(Str::singular($table_name)) . '.php';
+            if (in_array($model_name, $dir)) {
+                if ($ignore) {
+                    continue;
+                }
+
+                $this->alert("A tabela $table_name já existe");
+                $choice = $this->choice('Deseja ignorá-la?', ['s' => 'Sim', 'n' => 'Não', 't' => 'Ignorar todas as tabelas já existentes'], null);
+
+                if ($choice === 't') {
+                    $ignore = true;
+                    continue;
+                }
+
+                if ($choice === 's') {
+                    continue;
+                }
             }
 
             $this->callSilently('make:crud', [
