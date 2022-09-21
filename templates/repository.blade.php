@@ -23,7 +23,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @if($child_table['model_count'] == 1)
     public function {{$child_table['table']}} ()
     {
-      return $this->hasMany(\App\Models\{{$child_table['model']}}::class, {{$related_table['foreign_id']}}, 'id');
+      return $this->hasMany(\App\Models\{{$child_table['model']}}::class, {{$child_table['foreign_id']}}, 'id');
     }
 @endif
 @endforeach
