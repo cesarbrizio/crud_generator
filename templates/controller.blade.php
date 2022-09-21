@@ -11,9 +11,6 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
 
       ${{ lcfirst($data['pascal_singular']) }} = {{ $data['pascal_singular'] }}::all();
 
-      if(empty(${{ lcfirst($data['pascal_singular']) }})) {
-        return response()->json(['data' => null, 'status' => 'error', 'message' => 'Não há nenhum registro para ser exibido.']); 
-      }
       return {{ $data['pascal_singular'] }}Resource::collection(${{ lcfirst($data['pascal_singular']) }}->loadMissing([{!! htmlspecialchars_decode($data['other_tables_str']) !!}]));
     }
 
@@ -25,7 +22,7 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
     public function store({{ $data['pascal_singular'] }}Request $request) {
 
       if (${{ lcfirst($data['pascal_singular']) }} = {{ $data['pascal_singular'] }}::create($request->validated()))
-        {
+      {
         return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }});
       }
     }
@@ -34,16 +31,14 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
 
       if(${{ lcfirst($data['pascal_singular']) }}->update($request->validated())) {
         return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }});
-      } else {
-        return response()->json(['data' => null, 'status' => 'error', 'message' => 'Não foi possível atualizar o registro.']);
       }
     }
     
     public function destroy({{ $data['pascal_singular'] }} ${{ lcfirst($data['pascal_singular']) }}) {
 
-        if(${{ lcfirst($data['pascal_singular']) }}->delete()) {
-          return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }});
-        }
+      if(${{ lcfirst($data['pascal_singular']) }}->delete()) {
+        return new {{ $data['pascal_singular'] }}Resource(${{ lcfirst($data['pascal_singular']) }});
+      }
     }
 
 @if(!empty($data['related_tables']))
@@ -61,8 +56,6 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
         '{{$related_table['table']}}_options' => ${{ strtolower($related_table['model']) }}_options,
 @endif
 @endforeach
-        'status' => 'success',
-        'message' => 'Opções retornadas com sucesso.'
         ]);
 
     }
@@ -76,8 +69,6 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
 
       return response()->json([
         'data' => ${{ strtolower($field['name']) }}_options,
-        'status' => 'success',
-        'message' => 'Opções retornadas com sucesso.'
         ]);
 
     }

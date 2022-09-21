@@ -90,10 +90,8 @@ class {{ $data['pascal_plural'] }} extends Component {
         }; 
         Promise.resolve(header).then(function(value) {
           fetch(config.get('api') + '/{{$data['plural']}}', { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-            if (responseJson.status === 'success') {
-              self.setState({data: responseJson.data});
-              self.TableData(responseJson.data);
-            }
+            self.setState({data: responseJson.data});
+            self.TableData(responseJson.data);
           }).then(() => {
             self.setState({overlay: {message: '', type: '', status: 'closed'}});
             self.handleMessage();
@@ -114,10 +112,10 @@ class {{ $data['pascal_plural'] }} extends Component {
           var self = this;
           Promise.resolve(header).then(function(value) {
             fetch(config.get('api') + '/{{$data['plural']}}/' + id, { method: 'DELETE', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-              if (responseJson.status === 'success') {
-                self.deleteRow(id);
+              self.deleteRow(id);
+              if (responseJson.errors) {
+                self.handleAlert(responseJson.data, 'error', 'open');
               }
-              self.handleAlert(responseJson.message, responseJson.status, 'open');
             }).catch((error) => {
               console.error(error);
             });
@@ -165,16 +163,14 @@ class {{ $data['pascal_plural'] }} extends Component {
 @endif
 @endif
 @endforeach
-          { field: 'actions', headerName: 'Ações', flex: 1, minWidth: 150, renderCell: this.ActionsButtons },
+          { field: 'actions', headerName: 'Actions', flex: 1, minWidth: 150, renderCell: this.ActionsButtons },
         ];
         
         const rows = 
           data.map(function(k) {
             return {
 @foreach($data['fields'] as $field)
-@if($field['name'] == 'active' || $field['name'] == 'status' || $field['type'] == 'date')
-              {{$field['name']}}: k.{{$field['name']}}_str,
-@elseif($field['foreign_key'] == TRUE)
+@if($field['foreign_key'] == TRUE)
               {{$field['name']}}: k.{{str_replace('_id', '', $field['name'])}}.name,
 @elseif($field['name'] !== 'created_at' && $field['name'] !== 'updated_at' && $field['name'] !== 'deleted_at')
               {{$field['name']}}: k.{{$field['name']}},
@@ -202,7 +198,7 @@ class {{ $data['pascal_plural'] }} extends Component {
         <div>
             <Header></Header>
             <Overlay overlay={this.state.overlay} handleAlert={this.handleAlert} />
-            <Container>
+            <Container maxWidth={false}>
                 <div className="conteudo">
                     <h3>List of {{$data['pascal_plural']}}</h3>
                     <Stack direction="row" justifyContent="flex-end" spacing={2}>

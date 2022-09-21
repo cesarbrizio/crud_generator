@@ -1,10 +1,11 @@
 namespace App\Repositories;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use App\Models\AppModel;
 
 class {{ $data['pascal_singular'] }}Repository extends AppModel
 {
-      /*
+    /*
     * Relationships
     */
 @if(!empty($data['related_tables']))
@@ -12,7 +13,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @if($related_table['model_count'] == 1)
     public function {{$related_table['relationship_name']}} ()
     {
-      return $this->belongsTo(\App\Models\{{$related_table['model']}}::class);
+      return $this->belongsTo(\App\Models\{{$related_table['model']}}::class, {{$related_table['foreign_id']}}, 'id');
     }
 @endif
 @endforeach
@@ -22,7 +23,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @if($child_table['model_count'] == 1)
     public function {{$child_table['table']}} ()
     {
-      return $this->hasMany(\App\Models\{{$child_table['model']}}::class);
+      return $this->hasMany(\App\Models\{{$child_table['model']}}::class, {{$related_table['foreign_id']}}, 'id');
     }
 @endif
 @endforeach
@@ -51,71 +52,57 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @foreach($data['fields'] as $field)
 @if($field['type'] == 'date')
 
-    public function set{{ $field['pascal'] }}Attribute($value)
+    public function {{ $field['name'] }}(): Attribute
     {
       if(!empty($value)) {
-        return $this->attributes['{{ $field['name']  }}'] = AppModel::parseDate($value, 'Y-m-d');
+        $str = AppModel::parseDate($value, 'Y-m-d');
       }
+      return new Attribute(
+        set: fn ($value) => $str,
+      );
     }
 
-    public function get{{ $field['pascal'] }}StrAttribute($value)
-    {
-      if(!empty($this->attributes['{{ $field['name'] }}'])) {
-        return AppModel::parseDate($this->attributes['{{ $field['name']  }}'], 'd/m/Y');
-      }
-    }
 @elseif($field['type'] == 'datetime')
 
-    public function set{{ $field['pascal'] }}Attribute($value)
+    public function {{ $field['name'] }}(): Attribute
     {
       if(!empty($value)) {
-        return $this->attributes['{{ $field['name']  }}'] = AppModel::parseDate($value, 'Y-m-d H:i:s');
+        $str = AppModel::parseDate($value, 'Y-m-d H:i:s');
       }
+      return new Attribute(
+        set: fn ($value) => $str,
+      );
     }
 
-    public function get{{ $field['pascal'] }}StrAttribute($value)
-    {
-      if(!empty($this->attributes['{{ $field['name'] }}'])) {
-        return AppModel::parseDate($this->attributes['{{ $field['name']  }}'], 'd/m/Y H:i');
-      }
-    }
 @endif
 @if($field['name'] == 'active')
 
-    public function getActiveStrAttribute($value)
+    public function active(): Attribute
     {
       if(isset($this->attributes['active'])) {
         if ($this->attributes['active'] == 0) {
-          return 'Arquivado';
+          $str = 'Archived';
         }
         if ($this->attributes['active'] == 1) {
-          return 'Ativo';
+          $str = 'Active';
         }
       }
+      return new Attribute(
+        get: fn ($value) => $str,
+        set: fn ($value) => $value,
+      );
     }
 @endif
 @if($field['name'] == 'status')
     
-    public function getStatusStrAttribute($value)
+    public function status(): Attribute
     {
-      if(isset($this->attributes['status'])) {
-        if ($this->attributes['status'] == 0) {
-          return 'Cancelado';
-        }
-        if ($this->attributes['status'] == 1) {
-          return 'Rascunho';
-        }
-        if ($this->attributes['status'] == 2) {
-          return 'Em Andamento';
-        }
-        if ($this->attributes['status'] == 3) {
-          return 'Finalizado';
-        }
-      }
+      return new Attribute(
+        get: fn ($value) => ucwords($value),
+        set: fn ($value) => $value,
+      );
     }
 @endif
 @endforeach
-    
-    protected $appends = [{!! htmlspecialchars_decode($data['appends']) !!}];
 
 }

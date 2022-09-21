@@ -46,6 +46,9 @@ class {{$data['pascal_singular']}}Add extends Component {
 @if(!empty($field['options']))
           {{$field['name']}}_options: [],
 @endif
+@if($field['type'] == 'boolean' || $field['type'] == 'tinyint')
+          {{$field['name']}}: false,
+@endif
           {{$field['name']}}: '',
 @endif
 @endforeach
@@ -142,7 +145,9 @@ class {{$data['pascal_singular']}}Add extends Component {
 @if(!empty($data['related_tables']))
         var url = config.get('api') + '/{{$data['plural']}}/related/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-          if (responseJson.status === 'success') {
+          if (responseJson.errors) {
+            self.handleAlert(responseJson.message, 'error', 'open');
+          } else {
             self.setState({
 @foreach($data['related_tables'] as $related_table)
               {{$related_table['table']}}_options: responseJson.{{$related_table['table']}}_options,
@@ -155,7 +160,9 @@ class {{$data['pascal_singular']}}Add extends Component {
 @if(!empty($field['options']))
         var url = config.get('api') + '/{{$data['plural']}}/{{$field['name']}}/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-          if (responseJson.status === 'success') {
+          if (responseJson.errors) {
+            self.handleAlert(responseJson.message, 'error', 'open');
+          } else {
             self.setState({
               {{$field['name']}}_options: responseJson.data,
             });
@@ -193,17 +200,17 @@ class {{$data['pascal_singular']}}Add extends Component {
       }; 
       Promise.resolve(header).then(function(value) {
         fetch(config.get('api') + '/{{$data['plural']}}', { method: 'POST', mode: 'cors', headers: value, body: JSON.stringify(datasave) }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-          if (responseJson.status === 'success') {
-            var url = '/{{$data['plural']}}/update/' + responseJson.data.id;
+          if (responseJson.errors) {
+            self.validate(responseJson.errors);
             var storage = {
               alert_message: responseJson.message,
-              alert_type: responseJson.status,
+              alert_type: 'error',
             };
-            self.handleAlert(responseJson.message, responseJson.status, 'open');
+            self.handleAlert(responseJson.message, 'error', 'open');
             localStorage.setItem("verify_message", JSON.stringify(storage));
+          } else {
+            var url = '/{{$data['plural']}}/update/' + responseJson.data.id;
             self.setState({redirect_url: url});
-          } else if (responseJson.message === 'The given data was invalid.') {
-            self.validate(responseJson.errors);
           }
         }).catch((error) => {
           console.error(error);
@@ -218,7 +225,7 @@ class {{$data['pascal_singular']}}Add extends Component {
           <Header></Header>
           <Overlay overlay={this.state.overlay} handleAlert={this.handleAlert} />
           {this.state.redirect_url ? <Navigate to={{"{{"}}pathname: this.state.redirect_url}}/> : ""}
-          <Container>
+          <Container maxWidth={false}>
             <div className="conteudo">
               <h3>Add {{$data['pascal_singular']}}</h3>
               <Stack direction="row" justifyContent="flex-end" spacing={2}>
@@ -284,7 +291,7 @@ class {{$data['pascal_singular']}}Add extends Component {
                   </Grid>
 @elseif($field['type'] == 'boolean' || $field['type'] == 'tinyint')
                   <Grid item xl={6} md={6} sm={12} xs={12}>
-                    <FormControlLabel control={<Switch name="{{$field['name']}}" checked={this.state.{{$field['name']}}} onChange={this.handleChangeSwitch.bind(this, '{{$field['name']}}')} />} error={this.state.error_{{$field['name']}}} helperText={this.state.helperText_{{$field['name']}}} label="{{$field['name']}}" className="form-control" />
+                    <FormControlLabel control={<Switch name="{{$field['name']}}" checked={this.state.{{$field['name']}}} onChange={this.handleChangeSwitch.bind(this, '{{$field['name']}}')} />} error={this.state.error_{{$field['name']}}} label="{{$field['name']}}" className="form-control" />
                   </Grid>
 @elseif($field['foreign_key'] == TRUE)
                   <Grid item xl={6} md={6} sm={12} xs={12}>

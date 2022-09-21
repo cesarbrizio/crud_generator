@@ -46,6 +46,9 @@ class {{$data['pascal_singular']}}Edit extends Component {
 @if(!empty($field['options']))
           {{$field['name']}}_options: [],
 @endif
+@if($field['type'] == 'boolean' || $field['type'] == 'tinyint')
+          {{$field['name']}}: false,
+@endif
           {{$field['name']}}: '',
 @endif
 @endforeach
@@ -146,20 +149,25 @@ class {{$data['pascal_singular']}}Edit extends Component {
       Promise.resolve(header).then(function(value) {
         var url = config.get('api') + '/{{$data['plural']}}/'+self.props.match.params.id;
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-          if (responseJson.status === 'success') {
+          if (responseJson.errors) {
+            self.handleAlert(responseJson.message, 'error', 'open');
+          } else {
             self.setState({
 @foreach($data['fields'] as $field)
 @if($field['name'] !== 'created_at' && $field['name'] !== 'updated_at' && $field['name'] !== 'deleted_at')
-            {{$field['name']}}: responseJson.data.{{$field['name']}},
+              {{$field['name']}}: responseJson.data.{{$field['name']}},
 @endif
 @endforeach
             });
+            self.setState({overlay: {message: '', type: '', status: 'closed'}});
           }
         }).then(() => {
 @if(!empty($data['related_tables']))
         var url = config.get('api') + '/{{$data['plural']}}/related/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-          if (responseJson.status === 'success') {
+          if (responseJson.errors) {
+            self.handleAlert(responseJson.message, 'error', 'open');
+          } else {
             self.setState({
 @foreach($data['related_tables'] as $related_table)
               {{$related_table['table']}}_options: responseJson.{{$related_table['table']}}_options,
@@ -172,7 +180,9 @@ class {{$data['pascal_singular']}}Edit extends Component {
 @if(!empty($field['options']))
         var url = config.get('api') + '/{{$data['plural']}}/{{$field['name']}}/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-          if (responseJson.status === 'success') {
+          if (responseJson.errors) {
+            self.handleAlert(responseJson.message, 'error', 'open');
+          } else {
             self.setState({
               {{$field['name']}}_options: responseJson.data,
             });
@@ -180,7 +190,6 @@ class {{$data['pascal_singular']}}Edit extends Component {
         }).then(() => {
 @endif
 @endforeach
-          self.setState({overlay: {message: '', type: '', status: 'closed'}});
           self.handleMessage();
         }); /* Overlay */ @if(!empty($data['related_tables'])) }); @endif @foreach($data['fields'] as $field) @if(!empty($field['options'])) }); @endif @endforeach
       });
@@ -202,11 +211,12 @@ class {{$data['pascal_singular']}}Edit extends Component {
         'Authorization': 'Bearer ' +localStorage.getItem('token'),
       }; 
       Promise.resolve(header).then(function(value) {
-        fetch(config.get('api') + '/{{$data['plural']}}/', { method: 'PUT', mode: 'cors', headers: value, body: JSON.stringify(datasave) }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
-          if (responseJson.status === 'success') {
-            self.handleAlert(responseJson.message, responseJson.status, 'open');
-          } else if (responseJson.message === 'The given data was invalid.') {
+        fetch(config.get('api') + '/{{$data['plural']}}/' + self.state.id, { method: 'PUT', mode: 'cors', headers: value, body: JSON.stringify(datasave) }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
+          if (responseJson.errors) {
             self.validate(responseJson.errors);
+            self.handleAlert(responseJson.message, 'error', 'open');
+          } else {
+            self.handleAlert('Success', 'success', 'open');
           }
         }).catch((error) => {
           console.error(error);
@@ -220,7 +230,7 @@ class {{$data['pascal_singular']}}Edit extends Component {
         <div>
           <Header></Header>
           <Overlay overlay={this.state.overlay} handleAlert={this.handleAlert} />
-          <Container>
+          <Container maxWidth={false}>
             <div className="conteudo">
               <h3>Edit {{$data['pascal_singular']}}</h3>
               <Stack direction="row" justifyContent="flex-end" spacing={2}>
@@ -286,7 +296,7 @@ class {{$data['pascal_singular']}}Edit extends Component {
                   </Grid>
 @elseif($field['type'] == 'boolean' || $field['type'] == 'tinyint')
                   <Grid item xl={6} md={6} sm={12} xs={12}>
-                    <FormControlLabel control={<Switch name="{{$field['name']}}" checked={this.state.{{$field['name']}}} onChange={this.handleChangeSwitch.bind(this, '{{$field['name']}}')} />} error={this.state.error_{{$field['name']}}} helperText={this.state.helperText_{{$field['name']}}} label="{{$field['name']}}" className="form-control" />
+                    <FormControlLabel control={<Switch name="{{$field['name']}}" checked={this.state.{{$field['name']}}} onChange={this.handleChangeSwitch.bind(this, '{{$field['name']}}')} />} error={this.state.error_{{$field['name']}}} label="{{$field['name']}}" className="form-control" />
                   </Grid>
 @elseif($field['foreign_key'] == TRUE)
                   <Grid item xl={6} md={6} sm={12} xs={12}>
