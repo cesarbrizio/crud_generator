@@ -40,7 +40,7 @@ Quanto de front-end:
 
 - [CDN] No arquivo config/app após a configuração do env, adicione:
 
-`
+``
 
     /*
     |--------------------------------------------------------------------------
@@ -57,19 +57,19 @@ Quanto de front-end:
     'cdn_path' => env('CDN_PATH', '/path/to/cdn'),
     'cdn_url' => env('CDN_URL', '/path/to/url'),
 
-`
+``
 
 - [env] No arquivo .env adicione a linha:
 
-`
+``
 
     CDN_PATH=/path/to/your/system/cdn
 
-`
+``
 
 - [Exceptions] No arquivo app\Exceptions\Handler, altere o método register para:
 
-`
+``
 
     public function register()
     {
@@ -82,7 +82,7 @@ Quanto de front-end:
         });
     }
 
-`
+``
 ## Informações
 
 - [Nomenclatura]
