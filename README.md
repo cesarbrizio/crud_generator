@@ -30,15 +30,17 @@ Quanto de front-end:
 ## Configurações gerais
 
 - [Pastas] No seu projeto original, adicione as pastas:
-- /cdn
-- /cdn/uploads
-- app/Http/Requests
-- app/Http/Resources
-- app/Repositories
-- app/Models
+
+> /cdn
+> /cdn/uploads
+> app/Http/Requests
+> app/Http/Resources
+> app/Repositories
+> app/Models
 
 - [CDN] No arquivo config/app após a configuração do env, adicione:
 
+{
     /*
     |--------------------------------------------------------------------------
     | Application Content Delivery Network (CDN)
@@ -53,13 +55,17 @@ Quanto de front-end:
 
     'cdn_path' => env('CDN_PATH', '/path/to/cdn'),
     'cdn_url' => env('CDN_URL', '/path/to/url'),
+}
 
 - [env] No arquivo .env adicione a linha:
 
-CDN_PATH=/path/to/your/system/cdn
+{
+    CDN_PATH=/path/to/your/system/cdn
+}
 
 - [Exceptions] No arquivo app\Exceptions\Handler, altere o método register para:
 
+{
     public function register()
     {
         $this->reportable(function (Throwable $e) {
@@ -70,6 +76,8 @@ CDN_PATH=/path/to/your/system/cdn
             return response()->json(['errors' => 'Not found','message' => 'Object not found'], 404);
         });
     }
+
+}
 ## Informações
 
 - [Nomenclatura]
@@ -85,6 +93,7 @@ Ex.: company_publications
 - [Validações]
 
 Ficarão gravadas as seguintes validações no Request:
+
 > Required (para os campos NOT NULL)
 > Max (com o limite de dígitos do banco de dados)
 > Dateformat (para os campos do tipo datetime)
