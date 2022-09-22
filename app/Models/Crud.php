@@ -202,12 +202,20 @@ class Crud extends Model
         $routes .= "Route::get('/".$data['plural_lower']."', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'index']);\n";
         $routes .= "Route::get('/".$data['plural_lower']."/{".lcfirst($data['pascal_singular']) ."}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'show']);\n";
         $routes .= "Route::post('/".$data['plural_lower']."', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'store']);\n";
-        $routes .= "Route::put('/".$data['plural_lower']."/{".lcfirst($data['pascal_singular']) ."}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'update']);\n";
         $routes .= "Route::delete('/".$data['plural_lower']."/{".lcfirst($data['pascal_singular']) ."}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'destroy']);\n";
+        
+        if (str_contains($data['singular'], 'attachment') || str_contains($data['singular'], 'appendix')) {
+            foreach ($data['related_tables'] as $related_table) {
+                $routes .= "Route::get('/".$data['plural_lower']."/".$related_table['table']."/{id}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'index_by_".$related_table['table']."']);\n";
+            }
+        } else {
+            $routes .= "Route::put('/".$data['plural_lower']."/{".lcfirst($data['pascal_singular']) ."}', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'update']);\n";
+        }
 
         if(!empty($data['related_tables'])) {
             $routes .= "Route::get('/".$data['plural_lower']."/related/options', [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, 'options']);\n";
         }
+
         foreach ($data['fields'] as $field) {
             if (!empty($field['options'])) {
                 $routes .= "Route::get('/".$data['plural_lower']."/".$field['name']."/options/'".", [App\Http\Controllers\\".$data['pascal_plural']."Controller::class, '".$field['name']."_options']);\n";
