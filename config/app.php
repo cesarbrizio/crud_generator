@@ -32,6 +32,21 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Content Delivery Network (CDN)
+    |--------------------------------------------------------------------------
+    |
+    | These values help determine the content delivery network (CDN) that
+    | will be used for serving assets. By default, we'll use the default
+    | Laravel container, but you may specify any other CDN that you like.
+    | Set this in your ".env" file.
+    |
+    */
+
+    'cdn_path' => env('CDN_PATH', '/path/to/cdn'),
+    'cdn_url' => env('CDN_URL', '/path/to/url'),
+    
+    /*
+    |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
     |
