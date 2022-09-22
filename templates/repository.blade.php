@@ -13,7 +13,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @if($related_table['model_count'] == 1)
     public function {{$related_table['relationship_name']}} ()
     {
-      return $this->belongsTo(\App\Models\{{$related_table['model']}}::class, {{$related_table['foreign_id']}}, 'id');
+      return $this->belongsTo(\App\Models\{{$related_table['model']}}::class, '{{$related_table['foreign_id']}}', 'id');
     }
 @endif
 @endforeach
@@ -23,7 +23,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @if($child_table['model_count'] == 1)
     public function {{$child_table['table']}} ()
     {
-      return $this->hasMany(\App\Models\{{$child_table['model']}}::class, {{$child_table['key']}}, 'id');
+      return $this->hasMany(\App\Models\{{$child_table['model']}}::class, '{{$child_table['key']}}', 'id');
     }
 @endif
 @endforeach
@@ -104,5 +104,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
     }
 @endif
 @endforeach
+
+    protected $appends = [{!! htmlspecialchars_decode($data['appends']) !!}];
 
 }

@@ -152,8 +152,12 @@ class Crud extends Model
             
             $i++;
         };
-        $appends = "'".implode("', '", $appends)."'";
-        $appends = htmlspecialchars($appends);
+        if (count($appends) > 0) {
+            $appends = "'".implode("', '", $appends)."'";
+            $appends = htmlspecialchars($appends);
+        } else {
+            $appends = '';
+        }
 
         $other_tables = [];
         if (!empty($related_tables)) {

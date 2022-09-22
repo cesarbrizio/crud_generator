@@ -54,35 +54,35 @@ class CrudGenerator extends Command
         Crud::createRoutes($data);
         $this->info('Rotas criadas');
         
-        // Crud::createModel($data);
-        // $this->info('Model criado');
+        Crud::createModel($data);
+        $this->info('Model criado');
 
-        // Crud::createRepository($data);
-        // $this->info('Repository criado');
+        Crud::createRepository($data);
+        $this->info('Repository criado');
 
-        // Crud::createController($data);
-        // $this->info('Controller criado');
+        Crud::createController($data);
+        $this->info('Controller criado');
 
-        // Crud::createResource($data);
-        // $this->info('Resource criado');
+        Crud::createResource($data);
+        $this->info('Resource criado');
 
-        // Crud::createRequest($data);
-        // $this->info('Request criado');
+        Crud::createRequest($data);
+        $this->info('Request criado');
 
-        // Crud::createIndexComponentTemplate($data);
-        // $this->info('Component Index criado');
+        Crud::createIndexComponentTemplate($data);
+        $this->info('Component Index criado');
 
-        // Crud::createEditComponentTemplate($data);
-        // $this->info('Component Edit criado');
+        Crud::createEditComponentTemplate($data);
+        $this->info('Component Edit criado');
 
-        // Crud::createAddComponentTemplate($data);
-        // $this->info('Component Add criado');
+        Crud::createAddComponentTemplate($data);
+        $this->info('Component Add criado');
 
-        // Crud::createAppComponentTemplate($data);
-        // $this->info('Component App criado');
+        Crud::createAppComponentTemplate($data);
+        $this->info('Component App criado');
 
-        // Crud::createHeaderComponentTemplate($data);
-        // $this->info('Component Header criado');
+        Crud::createHeaderComponentTemplate($data);
+        $this->info('Component Header criado');
         
         $this->info('Atenção!');
         $this->info('Se a tabela possuir status, edite os tipos de status no Repository');
