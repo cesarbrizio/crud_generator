@@ -40,7 +40,8 @@ Quanto de front-end:
 
 - [CDN] No arquivo config/app após a configuração do env, adicione:
 
-``
+<code>
+
     /*
     |--------------------------------------------------------------------------
     | Application Content Delivery Network (CDN)
@@ -55,17 +56,21 @@ Quanto de front-end:
 
     'cdn_path' => env('CDN_PATH', '/path/to/cdn'),
     'cdn_url' => env('CDN_URL', '/path/to/url'),
-``
+
+</code>
 
 - [env] No arquivo .env adicione a linha:
 
-``
+<code>
+
     CDN_PATH=/path/to/your/system/cdn
-``
+
+</code>
 
 - [Exceptions] No arquivo app\Exceptions\Handler, altere o método register para:
 
-``
+<code>
+
     public function register()
     {
         $this->reportable(function (Throwable $e) {
@@ -76,7 +81,9 @@ Quanto de front-end:
             return response()->json(['errors' => 'Not found','message' => 'Object not found'], 404);
         });
     }
-``
+    
+</code>
+
 ## Informações
 
 - [Nomenclatura]
