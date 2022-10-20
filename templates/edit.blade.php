@@ -150,7 +150,7 @@ class {{$data['pascal_singular']}}Edit extends Component {
         var url = config.get('api') + '/{{$data['plural']}}/'+self.props.match.params.id;
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
           if (responseJson.errors) {
-            self.handleAlert(responseJson.message, 'error', 'open');
+            self.handleAlert('Error', 'error', 'open');
           } else {
             self.setState({
 @foreach($data['fields'] as $field)
@@ -166,7 +166,7 @@ class {{$data['pascal_singular']}}Edit extends Component {
         var url = config.get('api') + '/{{$data['plural']}}/related/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
           if (responseJson.errors) {
-            self.handleAlert(responseJson.message, 'error', 'open');
+            self.handleAlert('Error', 'error', 'open');
           } else {
             self.setState({
 @foreach($data['related_tables'] as $related_table)
@@ -181,7 +181,7 @@ class {{$data['pascal_singular']}}Edit extends Component {
         var url = config.get('api') + '/{{$data['plural']}}/{{$field['name']}}/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
           if (responseJson.errors) {
-            self.handleAlert(responseJson.message, 'error', 'open');
+            self.handleAlert('Error', 'error', 'open');
           } else {
             self.setState({
               {{$field['name']}}_options: responseJson.data,
@@ -214,7 +214,7 @@ class {{$data['pascal_singular']}}Edit extends Component {
         fetch(config.get('api') + '/{{$data['plural']}}/' + self.state.id, { method: 'PUT', mode: 'cors', headers: value, body: JSON.stringify(datasave) }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
           if (responseJson.errors) {
             self.validate(responseJson.errors);
-            self.handleAlert(responseJson.message, 'error', 'open');
+            self.handleAlert('Error', 'error', 'open');
           } else {
             self.handleAlert('Success', 'success', 'open');
           }

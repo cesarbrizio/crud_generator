@@ -146,7 +146,7 @@ class {{$data['pascal_singular']}}Add extends Component {
         var url = config.get('api') + '/{{$data['plural']}}/related/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
           if (responseJson.errors) {
-            self.handleAlert(responseJson.message, 'error', 'open');
+            self.handleAlert('Error', 'error', 'open');
           } else {
             self.setState({
 @foreach($data['related_tables'] as $related_table)
@@ -161,7 +161,7 @@ class {{$data['pascal_singular']}}Add extends Component {
         var url = config.get('api') + '/{{$data['plural']}}/{{$field['name']}}/options';
         fetch(url, { method: 'GET', mode: 'cors', headers: value }).then((response) => response.json()).catch((error) => { console.error(error); }).then((responseJson) => {
           if (responseJson.errors) {
-            self.handleAlert(responseJson.message, 'error', 'open');
+            self.handleAlert('Error', 'error', 'open');
           } else {
             self.setState({
               {{$field['name']}}_options: responseJson.data,
@@ -203,14 +203,15 @@ class {{$data['pascal_singular']}}Add extends Component {
           if (responseJson.errors) {
             self.validate(responseJson.errors);
             var storage = {
-              alert_message: responseJson.message,
+              alert_message: 'Error',
               alert_type: 'error',
             };
-            self.handleAlert(responseJson.message, 'error', 'open');
+            self.handleAlert('Error', 'error', 'open');
             localStorage.setItem("verify_message", JSON.stringify(storage));
           } else {
             var url = '/{{$data['plural']}}/update/' + responseJson.data.id;
             self.setState({redirect_url: url});
+            self.handleAlert('Success', 'success', 'open');
           }
         }).catch((error) => {
           console.error(error);

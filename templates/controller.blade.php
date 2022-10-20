@@ -88,8 +88,8 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
     }
 
   }
-
 @if(!empty($data['related_tables']))
+
   public function options () {
 
 @foreach($data['related_tables'] as $related_table)
@@ -108,9 +108,9 @@ class {{ $data['pascal_plural'] }}Controller extends Controller
 
   }
 @endif
-
 @foreach($data['fields'] as $field)
 @if($field['type'] == 'enum')
+
   public function {{$field['name']}}_options () {
 
     ${{ strtolower($field['name']) }}_options = {{ $data['pascal_singular'] }}::get{{$field['pascal']}}Options();

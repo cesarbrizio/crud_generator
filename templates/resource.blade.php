@@ -30,6 +30,9 @@ class {{ $data['pascal_singular'] }}Resource extends JsonResource
 @else
             '{{$field['name']}}' => $this->{{$field['name']}},
 @endif
+@if($field['name'] == 'active' || $field['name'] == 'status')
+            '{{$field['name']}}_str' => $this->{{$field['name']}}_str,
+@endif
 @endforeach
 @if(!empty($data['related_tables']))
 @foreach($data['related_tables'] as $related_table)

@@ -11,6 +11,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @if(!empty($data['related_tables']))
 @foreach($data['related_tables'] as $related_table)
 @if($related_table['model_count'] == 1)
+
     public function {{$related_table['relationship_name']}} ()
     {
       return $this->belongsTo(\App\Models\{{$related_table['model']}}::class, '{{$related_table['foreign_id']}}', 'id');
@@ -21,6 +22,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @if(!empty($data['child_tables']))
 @foreach($data['child_tables'] as $child_table)
 @if($child_table['model_count'] == 1)
+
     public function {{$child_table['table']}} ()
     {
       return $this->hasMany(\App\Models\{{$child_table['model']}}::class, '{{$child_table['key']}}', 'id');
@@ -28,6 +30,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @endif
 @endforeach
 @endif
+
     /**
      * The attributes that should be hidden for arrays.
      *
@@ -77,30 +80,25 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
 @endif
 @if($field['name'] == 'active')
 
-    public function active(): Attribute
+    public function getActiveStrAttribute($value)
     {
       if(isset($this->attributes['active'])) {
         if ($this->attributes['active'] == 0) {
-          $str = 'Archived';
+          return 'Archived';
         }
         if ($this->attributes['active'] == 1) {
-          $str = 'Active';
+          return 'Active';
         }
       }
-      return new Attribute(
-        get: fn ($value) => $str,
-        set: fn ($value) => $value,
-      );
     }
 @endif
 @if($field['name'] == 'status')
     
-    public function status(): Attribute
+    public function getStatusStrAttribute($value)
     {
-      return new Attribute(
-        get: fn ($value) => ucwords($value),
-        set: fn ($value) => $value,
-      );
+      if(isset($this->attributes['status'])) {
+        return ucwords($this->attributes['status']);
+      }
     }
 @endif
 @endforeach

@@ -12,6 +12,7 @@ class {{ $data['pascal_singular'] }} extends {{ $data['pascal_singular'] }}Repos
 @if(!empty($data['related_tables']))
 @foreach($data['related_tables'] as $related_table)
 @if($related_table['model_count'] == 1)
+
     public static function get{{ $related_table['model'] }}Options () {
       $data = \App\Models\{{ $related_table['model'] }}::select('id', 'name')->get();
       return $data->toArray();
@@ -22,10 +23,11 @@ class {{ $data['pascal_singular'] }} extends {{ $data['pascal_singular'] }}Repos
 
 @foreach($data['fields'] as $field)
 @if($field['type'] == 'enum')
+
     public static function get{{$field['pascal']}}Options () {
       $data = [];
 @foreach($field['options'] as $option)
-      $data[] = ['value' => '{{$option['value']}}', 'label' => '{{$option['label']}}'];
+      $data[] = ['value' => '{{$option['value']}}', 'label' => '{{ucwords($option['label'])}}'];
 @endforeach
       return $data;
     }

@@ -170,7 +170,9 @@ class {{ $data['pascal_plural'] }} extends Component {
           data.map(function(k) {
             return {
 @foreach($data['fields'] as $field)
-@if($field['foreign_key'] == TRUE)
+@if($field['name'] == 'active' || $field['name'] == 'status' || $field['type'] == 'date')
+              {{$field['name']}}: k.{{$field['name']}}_str,
+@elseif($field['foreign_key'] == TRUE)
               {{$field['name']}}: k.{{str_replace('_id', '', $field['name'])}}.name,
 @elseif($field['name'] !== 'created_at' && $field['name'] !== 'updated_at' && $field['name'] !== 'deleted_at')
               {{$field['name']}}: k.{{$field['name']}},
