@@ -58,7 +58,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
     public function {{ $field['name'] }}(): Attribute
     {
       if(!empty($value)) {
-        $str = \App\Models\AppModel::parseDate($value, 'Y-m-d');
+        $str = AppModel::parseDate($value, 'Y-m-d');
       }
       return new Attribute(
         set: fn ($value) => $str,
@@ -70,7 +70,7 @@ class {{ $data['pascal_singular'] }}Repository extends AppModel
     public function {{ $field['name'] }}(): Attribute
     {
       if(!empty($value)) {
-        $str = \App\Models\AppModel::parseDate($value, 'Y-m-d H:i:s');
+        $str = AppModel::parseDate($value, 'Y-m-d H:i:s');
       }
       return new Attribute(
         set: fn ($value) => $str,
